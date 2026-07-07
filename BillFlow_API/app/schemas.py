@@ -1,7 +1,7 @@
 from pydantic import BaseModel , EmailStr
 from typing import Optional
 from datetime import datetime
-from app.models import InvoiceStatus
+from BillFlow_API.app.models import InvoiceStatus
 
 
 # --Tenant ----

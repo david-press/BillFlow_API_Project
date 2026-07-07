@@ -1,6 +1,6 @@
 from sqlalchemy import String, ForeignKey , Numeric , Enum , DateTime , func
 from sqlalchemy.orm import Mapped , mapped_column , relationship
-from app.database import Base
+from BillFlow_API.app.database import Base
 import enum
 import uuid
 

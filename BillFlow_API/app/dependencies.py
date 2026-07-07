@@ -2,9 +2,9 @@ from fastapi import Depends, HTTPException, Security
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, APIKeyHeader
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.database import AsyncSessionLocal
-from app.models import Tenant, ApiKey
-from app.auth import decode_token
+from BillFlow_API.app.database import AsyncSessionLocal
+from BillFlow_API.app.models import Tenant, ApiKey
+from BillFlow_API.app.auth import decode_token
 
 
 # ─── Dependency 1: Database Session ───────────────────────

@@ -1,12 +1,12 @@
 from fastapi import APIRouter , Depends , HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.dependencies import get_db 
-from app.models import Tenant
-from app.models import ApiKey
-from app.auth import generate_api_key
-from app.schemas import TenantCreate , TenantOut
-from app.dependencies import get_current_tenant
+from BillFlow_API.app.dependencies import get_db 
+from BillFlow_API.app.models import Tenant
+from BillFlow_API.app.models import ApiKey
+from BillFlow_API.app.auth import generate_api_key
+from BillFlow_API.app.schemas import TenantCreate , TenantOut
+from BillFlow_API.app.dependencies import get_current_tenant
 
 router = APIRouter(prefix="/tenants" , tags = ["Tenants"])
 

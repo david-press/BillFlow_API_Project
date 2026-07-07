@@ -1,10 +1,10 @@
-from app.models import Tenant
+from BillFlow_API.app.models import Tenant
 from sqlalchemy import select
-from app.dependencies import get_db
+from BillFlow_API.app.dependencies import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException
-from app.schemas import TenantSignup, TenantLogin, Token, RefreshRequest
-from app.auth import hash_password, verify_password, create_access_token, create_refresh_token, decode_token
+from BillFlow_API.app.schemas import TenantSignup, TenantLogin, Token, RefreshRequest
+from BillFlow_API.app.auth import hash_password, verify_password, create_access_token, create_refresh_token, decode_token
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
