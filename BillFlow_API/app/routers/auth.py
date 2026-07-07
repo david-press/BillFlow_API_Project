@@ -1,10 +1,10 @@
-from models import Tenant
+from app.models import Tenant
 from sqlalchemy import select
-from dependencies import get_db
+from app.dependencies import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from fastapi import APIRouter, Depends, HTTPException
-from schemas import TenantSignup, TenantLogin, Token, RefreshRequest
-from auth import hash_password, verify_password, create_access_token, create_refresh_token, decode_token
+from app.schemas import TenantSignup, TenantLogin, Token, RefreshRequest
+from app.auth import hash_password, verify_password, create_access_token, create_refresh_token, decode_token
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

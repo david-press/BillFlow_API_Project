@@ -4,6 +4,7 @@ sqlalchemy[asyncio]
 asyncpg
 pydantic
 email-validator
+python-dotenv
 
 python-jose[cryptography]
 passlib[bcrypt]

@@ -1,7 +1,7 @@
 from fastapi import FastAPI
-from database import lifespan
+from app.database import lifespan
 from fastapi.middleware.cors import CORSMiddleware
-from routers import clients , invoices , tenants, auth
+from app.routers import clients , invoices , tenants , auth
 
 app = FastAPI(
     title= "BillFlow API",

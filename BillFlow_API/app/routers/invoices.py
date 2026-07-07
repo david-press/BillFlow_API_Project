@@ -1,9 +1,9 @@
 from fastapi import APIRouter , Depends , HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select , func
-from dependencies import get_db , get_current_tenant
-from models import Invoice , Client , Tenant , InvoiceStatus
-from schemas import ClientCreate , ClientOut , InvoiceCreate , InvoiceOut , InvoiceUpdate , BillingSummary
+from app.dependencies import get_db , get_current_tenant
+from app.models import Invoice , Client , Tenant , InvoiceStatus
+from app.schemas import ClientCreate , ClientOut , InvoiceCreate , InvoiceOut , InvoiceUpdate , BillingSummary
 
 router = APIRouter(prefix="/invoices" , tags = ["Invoices"])
 
