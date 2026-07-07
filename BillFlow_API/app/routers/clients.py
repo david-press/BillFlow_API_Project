@@ -1,9 +1,9 @@
 from fastapi import APIRouter , Depends , HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.dependencies import get_db , get_current_tenant
-from app.models import Client , Tenant
-from app.schemas import ClientCreate , ClientOut
+from dependencies import get_db , get_current_tenant , get_current_tenant_flexible
+from models import Client , Tenant
+from schemas import ClientCreate , ClientOut
 
 router = APIRouter(prefix="/clients" , tags = ["Clients"])
 

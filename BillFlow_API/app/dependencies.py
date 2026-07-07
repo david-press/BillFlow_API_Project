@@ -1,12 +1,13 @@
-from fastapi import Depends , HTTPException , Header
+from fastapi import Depends, HTTPException, Security
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials, APIKeyHeader
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.database import AsyncSessionLocal
-from app.models import Tenant
+from database import AsyncSessionLocal
+from models import Tenant, ApiKey
+from auth import decode_token
 
-#--- Dependency 1 : Database Session ----
-#Every route that touches the db gets a fresh Session
-#injected - and its guaranted to close after request
+
+# ─── Dependency 1: Database Session ───────────────────────
 
 async def get_db() -> AsyncSession:
     async with AsyncSessionLocal() as session:
@@ -17,20 +18,62 @@ async def get_db() -> AsyncSession:
             await session.rollback()
             raise
 
-# ---- Dependency 2 : Current Tenant
-#simulate auth via a header for now.
-#in production this would decode a JWT token
-#here the get_current_tenant depends on get_db()
+
+# ─── Bearer scheme (JWT extraction) ───────────────────────
+
+bearer_scheme = HTTPBearer()
+
+
+# ─── Dependency 2: Current Tenant via JWT ──────────────────
 
 async def get_current_tenant(
-        x_tenant_id : str = Header(..., description="Tenant ID header"),
-        db : AsyncSession = Depends(get_db)
+    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    db: AsyncSession = Depends(get_db)
 ) -> Tenant:
-    result = await db.execute(
-        select(Tenant).where(Tenant.id == x_tenant_id)
-    )
+    token = credentials.credentials
+
+    try:
+        payload = decode_token(token)
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+    if payload.get("type") != "access":
+        raise HTTPException(status_code=401, detail="Token is not an access token")
+
+    tenant_id = payload.get("sub")
+    if tenant_id is None:
+        raise HTTPException(status_code=401, detail="Token missing subject")
+
+    result = await db.execute(select(Tenant).where(Tenant.id == tenant_id))
     tenant = result.scalar_one_or_none()
 
     if not tenant:
-        raise HTTPException(status_code=404 , detail = "Tenant not found")
+        raise HTTPException(status_code=404, detail="Tenant not found")
+
     return tenant
+
+
+# ─── API key scheme (for service/flexible auth) ───────────
+
+api_key_scheme = APIKeyHeader(name="x-api-key", auto_error=False)
+
+
+# ─── Dependency 3: Current Tenant via JWT OR API key ───────
+
+async def get_current_tenant_flexible(
+    api_key: str = Security(api_key_scheme),
+    credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
+    db: AsyncSession = Depends(get_db)
+) -> Tenant:
+    if api_key:
+        result = await db.execute(select(ApiKey).where(ApiKey.key == api_key))
+        key_row = result.scalar_one_or_none()
+        if not key_row:
+            raise HTTPException(status_code=401, detail="Invalid API key")
+        result = await db.execute(select(Tenant).where(Tenant.id == key_row.tenant_id))
+        return result.scalar_one_or_none()
+
+    if credentials:
+        return await get_current_tenant(credentials, db)
+
+    raise HTTPException(status_code=401, detail="No valid credentials provided")

@@ -1,7 +1,7 @@
 from pydantic import BaseModel , EmailStr
 from typing import Optional
 from datetime import datetime
-from app.models import InvoiceStatus
+from models import InvoiceStatus
 
 
 # --Tenant ----
@@ -16,7 +16,29 @@ class TenantOut(BaseModel):
     created_at : datetime
 
     model_config = {"from_attributes" : True} # this tells pydantic that  an sqlalchemy model object is going to be handed to you , read its attributes directly
-    
+
+# ─── Auth ───────────────────────────────────────────────────
+
+class TenantSignup(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+
+
+class TenantLogin(BaseModel):
+    email: EmailStr
+    password: str
+
+
+class Token(BaseModel):
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+
+
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
 
 # --- Client ------
 class ClientCreate(BaseModel):

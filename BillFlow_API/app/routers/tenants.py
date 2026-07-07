@@ -1,33 +1,14 @@
 from fastapi import APIRouter , Depends , HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.dependencies import get_db 
-from app.models import Tenant
-from app.schemas import TenantCreate , TenantOut
+from dependencies import get_db 
+from models import Tenant
+from models import ApiKey
+from auth import generate_api_key
+from schemas import TenantCreate , TenantOut
+from dependencies import get_current_tenant
 
 router = APIRouter(prefix="/tenants" , tags = ["Tenants"])
-
-# -- create Tenant
-@router.post("/" , response_model= TenantOut)
-async def create_tenant(
-    payload : TenantCreate,
-    db : AsyncSession = Depends(get_db)
-):
-    # check email
-    result = await db.execute(
-        select(Tenant).where(Tenant.email == payload.email)
-    )
-    existing = result.scalar_one_or_none()
-    if existing:
-        raise HTTPException(status_code= 404 , detail = "Email already registered")
-    tenant = Tenant(
-        name = payload.name,
-        email = payload.email
-    )
-    db.add(tenant)
-    await db.flush()
-    await db.refresh(tenant)
-    return tenant
 
 # --- Get all tenant
 
@@ -39,3 +20,15 @@ async def get_tenants(
         select(Tenant)
     )
     return result.scalars().all()
+
+@router.post("/api-keys")
+async def create_api_key(
+    label: str,
+    db: AsyncSession = Depends(get_db),
+    tenant: Tenant = Depends(get_current_tenant)
+):
+    new_key = ApiKey(tenant_id=tenant.id, key=generate_api_key(), label=label)
+    db.add(new_key)
+    await db.flush()
+    await db.refresh(new_key)
+    return {"label": new_key.label, "key": new_key.key}

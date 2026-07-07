@@ -3,6 +3,8 @@ from sqlalchemy.orm import DeclarativeBase
 from contextlib import asynccontextmanager
 import os
 
+import os
+
 DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql+asyncpg://postgres:postgres@localhost:5432/billflow")
 
 # engine is connection pool, created once, reusable across all requests

@@ -1,6 +1,6 @@
 from sqlalchemy import String, ForeignKey , Numeric , Enum , DateTime , func
 from sqlalchemy.orm import Mapped , mapped_column , relationship
-from app.database import Base
+from database import Base
 import enum
 import uuid
 
@@ -18,6 +18,7 @@ class Tenant(Base):
     id : Mapped[str] = mapped_column(String , primary_key = True , default = lambda : str(uuid.uuid4()))
     name : Mapped[str] = mapped_column(String(100) , nullable = False)
     email : Mapped[str] = mapped_column(String(225) , unique = True , nullable = False)
+    hashed_password: Mapped[str] = mapped_column(String, nullable=False)
     created_at : Mapped[DateTime] = mapped_column(DateTime(timezone= True) , server_default= func.now())
 
     # relationship
@@ -55,7 +56,14 @@ class Invoice(Base):
     client : Mapped[list["Client"]] = relationship(back_populates="invoices" , lazy = "selectin")
 
 
+class ApiKey(Base):
+    __tablename__ = "api_keys"
 
+    id: Mapped[str] = mapped_column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    tenant_id: Mapped[str] = mapped_column(String, ForeignKey("tenants.id", ondelete="CASCADE"), nullable=False)
+    key: Mapped[str] = mapped_column(String, unique=True, nullable=False)
+    label: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-
+    tenant: Mapped["Tenant"] = relationship(lazy="selectin")
     
