@@ -7,7 +7,7 @@ import os
 load_dotenv()
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
-print("DATABASE_URL: ", DATABASE_URL)
+
 # engine is connection pool, created once, reusable across all requests
 engine = create_async_engine(
     DATABASE_URL,
